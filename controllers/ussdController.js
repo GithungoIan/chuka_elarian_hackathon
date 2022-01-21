@@ -1,6 +1,6 @@
 const log = require("signale");
 const config = require("config");
-const User = require("../models/userModel");
+// const User = require("../models/userModel");
 
 const getNextScreen = (nextScreen, input) => {
   switch (nextScreen) {
@@ -26,10 +26,8 @@ const getNextScreen = (nextScreen, input) => {
       } else if (input === "2") {
         nextScreen = "view-collectors";
       } else if (input === "3") {
-        nextScreen = "talk-to-an-agent";
-      } else if (input === "4") {
         nextScreen = "crowdfunding";
-      } else if (input === "5") {
+      } else if (input === "4") {
         nextScreen = "quit";
       }
       break;
@@ -38,7 +36,7 @@ const getNextScreen = (nextScreen, input) => {
       if (input === "1") {
         nextScreen = "stellar";
       } else if (input === "2") {
-        nextScreen = "m-pesa";
+        nextScreen = "mpesa";
       }
 
       break;
@@ -60,7 +58,14 @@ exports.handleUssdSession = async (
   log.info(nextScreen);
 
   const customerData = await customer.getMetadata();
-  let { name, address, role, registered = false, collector } = customerData;
+  let {
+    name,
+    address,
+    role,
+    registered = false,
+    collector,
+    houseNumber,
+  } = customerData;
 
   console.log(customerData);
   const menu = {
@@ -82,6 +87,7 @@ exports.handleUssdSession = async (
       name,
       address,
       role,
+      houseNumber,
       registered,
     },
   };
@@ -101,7 +107,7 @@ exports.handleUssdSession = async (
 
     case "register-location":
       name = input;
-      menu.text = `Great ${name}, whats your location?\n${config
+      menu.text = `Great ${name}, whats your Estate?\n${config
         .get("locations")
         .map((i, idx) => `${idx + 1}. ${i}`)
         .join("\n")}`;
@@ -120,7 +126,7 @@ exports.handleUssdSession = async (
         .get("roles")
         .map((i, idx) => `${idx + 1}. ${i}`)
         .join("\n")}`;
-      nextScreen = "register-complete";
+      nextScreen = "register-house";
       activity.key = "RegistrationGetRole";
       activity.properties = {
         ...activity.properties,
@@ -128,15 +134,25 @@ exports.handleUssdSession = async (
       };
       break;
 
-    case "register-complete":
+    case "register-house":
       role = config.get("roles")[parseInt(input, 10) - 1];
+      menu.text = "Enter your house number.";
+      nextScreen = "register-complete";
+      activity.properties = {
+        ...activity.properties,
+        role,
+      };
+      break;
+
+    case "register-complete":
+      houseNumber = input;
       menu.text = `Great! Thank you ${name} for registering on Garbanize. We are processing your application and will get back to you shortly`;
       menu.isTerminal = true;
       registered = true;
       activity.key = "RegistrationFinished";
       activity.properties = {
         ...activity.properties,
-        role,
+        houseNumber,
         registered,
       };
 
@@ -146,7 +162,7 @@ exports.handleUssdSession = async (
       customer
         .sendMessage(
           {
-            number: process.env.SENDER_ID,
+            number: process.env.SMS_SENDER_ID,
             channel: "sms",
           },
           {
@@ -161,18 +177,19 @@ exports.handleUssdSession = async (
 
     // main menu
     case "home":
-      menu.text = `Welcome to Garbanize!\n1.Garbage collection \n2.View Collectors\n3.Talk to an Agent\n4.Crowdfunding\n5. Quit`;
+      menu.text = `Welcome to Garbanize!\n1.Garbage collection \n2.View Collectors\n3.Crowdfunding\n4. Quit`;
       activity.key = "showHome";
       break;
 
     case "garbage-collection":
       menu.text =
-        "Okay! Are you a landlord or a homeowner?\n1.landlord \n2. top Collectors\n3. back";
+        "Okay! Are you a Home Owner or a Tenant?\n1.landlord \n2. top Collectors\n3. back";
+      nextScreen = "home";
       break;
 
     case "roles":
       menu.text =
-        "Greetings Landlord! Please select services needed?\n1.Call Collectors \n2.Send SMS reminder\n3.back";
+        "Greetings Home Owner! Please select services needed?\n1.Call Collectors \n2.Send SMS reminder\n3.back";
       nextScreen = "home";
       menu.isTerminal = true;
       break;
@@ -200,8 +217,22 @@ exports.handleUssdSession = async (
       break;
 
     case "mpesa":
-      menu.text = "not available at the moment";
-      nextScreen = "home";
+      menu.text = "Insert your payment number";
+      nextScreen = "insert-mpesa-number";
+      activity.properties = {
+        ...activity.properties,
+      };
+      break;
+
+    case "insert-mpesa-number":
+      menu.text = "Insert mpesa number";
+      nextScreen = "confirm-payment";
+      // menu.isTerminal = true;
+      break;
+
+    case "confirm-payment":
+      const mpesaNumber = input;
+      menu.text = `A request has been sent to your ${mpesaNumber} `;
       menu.isTerminal = true;
       break;
 

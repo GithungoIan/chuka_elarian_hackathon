@@ -5,15 +5,16 @@
 	},
 
 	"locations": [
-		"Nairobi",
-		"Kiambu",
-		"Nakuru",
-		"kisumu",
-		"Mombasa"
+		"Tatu",
+		"Nyayo",
+		"Kilimani",
+		"Slaughter",
+		"Makini",
+		"Kichinjio"
 	],
 
 	"roles": [
-		"land Lord",
+		"Home Owner",
 		"collector"
 	],
 	
