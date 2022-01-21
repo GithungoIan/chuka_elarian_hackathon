@@ -1,5 +1,8 @@
 const client = require("../utils/client");
 const ussdController = require("./ussdController");
+const paymentController = require("./paymentController");
+const messageController = require("./messageController");
+
 const log = require("signale");
 
 exports.start = () => {
@@ -12,5 +15,7 @@ exports.start = () => {
       log.info(`App is ready to process requests via ${process.env.USSD_CODE}`);
     })
     .on("ussdSession", ussdController.handleUssdSession)
+    .on("receivedPayment", paymentController.handlePayment)
+    .on("reminder", messageController.handleMessaging)
     .connect();
 };
