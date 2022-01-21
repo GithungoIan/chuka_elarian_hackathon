@@ -9,6 +9,7 @@
   "author": "Ian Githungo",
   "license": "ISC",
   "dependencies": {
+    "config": "^3.3.7",
     "dotenv": "^14.2.0",
     "elarian": "^0.2.23",
     "express": "^4.17.2",
