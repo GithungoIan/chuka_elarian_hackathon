@@ -1,0 +1,24 @@
+{
+  "name": "chuka_elarian_hackathon",
+  "version": "1.0.0",
+  "description": "Elarian Chuka Hackathon",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ian Githungo",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^14.2.0",
+    "elarian": "^0.2.23",
+    "express": "^4.17.2",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^6.1.0",
+    "mongoose": "^6.1.7",
+    "morgan": "^1.10.0",
+    "signale": "^1.4.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
